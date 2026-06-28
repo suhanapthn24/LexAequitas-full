@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.lexaequitas.service.DocumentAnalyzerService;
 
-import java.nio.file.*;
 import java.util.*;
 
 @RestController
