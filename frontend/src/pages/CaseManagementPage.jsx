@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 
-const API = "http://localhost:8080/api";
+const API = "https://mpj-backend-java.onrender.com/api";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const CASE_TYPES = ["civil", "criminal", "family", "corporate", "property", "labour", "tax", "constitutional"];

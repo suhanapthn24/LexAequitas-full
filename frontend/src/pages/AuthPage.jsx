@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Scale, Mail, Lock, User, Building, Loader2, ArrowRight, ShieldCheck, RotateCcw } from "lucide-react";
 
-const API = "http://localhost:8080/api";
+const API = "https://mpj-backend-java.onrender.com/api";
 
 const AuthPage = () => {
   const navigate = useNavigate();

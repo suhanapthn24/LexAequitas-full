@@ -24,7 +24,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const API = "http://localhost:8080/api";
+const API = "https://mpj-backend-java.onrender.com/api";
 
 // ─── Auth helper (same pattern as ComplianceAlertsPage) ───────────────────────
 const useAuthCfg = (getAuthHeader) => () => {

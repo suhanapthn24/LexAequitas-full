@@ -29,7 +29,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const API = "http://localhost:8080/api";
+const API = "https://mpj-backend-java.onrender.com/api";
 
 // ─── Timezone-safe date parser ─────────────────────────────────────────────────
 // Spring Boot serialises LocalDateTime in THREE possible ways depending on config:

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
 
-const API = "http://localhost:8080/api";
+const API = "https://mpj-backend-java.onrender.com/api";
 
 const CASE_TYPES = ["Criminal", "Civil", "Corporate", "Constitutional", "Family", "Tax"];
 const PHASES     = ["Opening", "Examination", "Cross", "Closing"];

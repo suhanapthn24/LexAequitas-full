@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext(null);
 
-const API = "http://localhost:8080/api";
+const API = "https://mpj-backend-java.onrender.com/api";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const login = async ({ email, password }) => {
-    const res = await fetch("http://localhost:8080/api/auth/login", {
+    const res = await fetch("https://mpj-backend-java.onrender.com/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
