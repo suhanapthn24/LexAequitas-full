@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.List;
@@ -45,7 +46,10 @@ public class SimulationService {
                     .bodyValue(payload)
                     .retrieve()
                     .bodyToMono(String.class)
-                    .timeout(Duration.ofSeconds(30))
+                    .timeout(Duration.ofSeconds(90))
+                    .retryWhen(Retry.fixedDelay(2, Duration.ofSeconds(30))
+                            .filter(e -> e instanceof WebClientResponseException &&
+                                    ((WebClientResponseException) e).getStatusCode().value() == 502))
                     .block();
 
             return objectMapper.readValue(raw, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
@@ -67,7 +71,10 @@ public class SimulationService {
                     .bodyValue(Map.of("text", documentText))
                     .retrieve()
                     .bodyToMono(String.class)
-                    .timeout(Duration.ofSeconds(30))
+                    .timeout(Duration.ofSeconds(90))
+                    .retryWhen(Retry.fixedDelay(2, Duration.ofSeconds(30))
+                            .filter(e -> e instanceof WebClientResponseException &&
+                                    ((WebClientResponseException) e).getStatusCode().value() == 502))
                     .block();
 
             return objectMapper.readValue(raw, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
