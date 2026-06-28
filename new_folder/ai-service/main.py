@@ -34,9 +34,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("lexaequitas")
 
 client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY"),
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+    base_url="https://openrouter.ai/api/v1",
 )
-MODEL = "gpt-4o-mini"
+MODEL = "openai/gpt-4o-mini"
 
 app = FastAPI(title="LexAequitas API", version="2.0.0")
 
