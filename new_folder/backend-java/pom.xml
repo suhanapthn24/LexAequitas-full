@@ -25,10 +25,17 @@
           <artifactId>spring-boot-starter-data-jpa</artifactId>
       </dependency>
 
-      <!-- PostgreSQL driver -->
+      <!-- PostgreSQL driver (used in Render production) -->
       <dependency>
           <groupId>org.postgresql</groupId>
           <artifactId>postgresql</artifactId>
+          <scope>runtime</scope>
+      </dependency>
+
+      <!-- H2 embedded database (used locally when PostgreSQL is not available) -->
+      <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
           <scope>runtime</scope>
       </dependency>
 

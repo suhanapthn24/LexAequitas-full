@@ -25,7 +25,7 @@ public class PrecedenceService {
 
     public PrecedenceService() {
         this.webClient = WebClient.builder()
-                .baseUrl("http://0.0.0.0:8000")
+                .baseUrl("https://mpj-backend-python-1.onrender.com")
                 .codecs(cfg -> cfg.defaultCodecs().maxInMemorySize(4 * 1024 * 1024))
                 .build();
     }

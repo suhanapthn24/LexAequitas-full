@@ -17,7 +17,7 @@ public class SimulationService {
 
     public SimulationService() {
         this.webClient = WebClient.builder()
-                .baseUrl("http://0.0.0.0:8000")
+                .baseUrl("https://mpj-backend-python-1.onrender.com")
                 .codecs(config -> config.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
                 .build();
     }

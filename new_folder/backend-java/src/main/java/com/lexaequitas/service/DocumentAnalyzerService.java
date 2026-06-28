@@ -20,7 +20,7 @@ public class DocumentAnalyzerService {
                .contentType(MediaType.APPLICATION_OCTET_STREAM);
 
         return webClient.post()
-                .uri("http://0.0.0.0:8000/analyse")
+                .uri("https://mpj-backend-python-1.onrender.com/analyse")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .bodyValue(builder.build())
                 .retrieve()
