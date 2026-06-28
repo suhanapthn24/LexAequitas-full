@@ -61,30 +61,12 @@ public class AuthController {
         return authService.register(user);
     }
 
-    /**
-     * Step 1 of login: validate credentials, send OTP to email.
-     * Returns HTTP 200 with { "mfaPending": true } on success — no JWT yet.
-     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         try {
-            authService.initiateLogin(user);
-            return ResponseEntity.ok(Map.of("mfaPending", true));
-        } catch (RuntimeException e) {
-            System.out.println("LOGIN ERROR: " + e.getMessage());
-            return ResponseEntity.status(401).body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/verify-otp")
-    public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> body) {
-        try {
-            String email = body.get("email");
-            String otp   = body.get("otp");
-            String token = authService.verifyOtp(email, otp);
+            String token = authService.login(user);
             return ResponseEntity.ok(Map.of("token", token));
         } catch (RuntimeException e) {
-            System.out.println("OTP ERROR: " + e.getMessage());
             return ResponseEntity.status(401).body(e.getMessage());
         }
     }

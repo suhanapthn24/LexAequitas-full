@@ -69,36 +69,16 @@ public class DocumentController {
             @RequestParam("file") MultipartFile file
     ) {
         try {
-            System.out.println("🔥 CONTROLLER HIT");
-            System.out.println("File null? " + (file == null));
-            System.out.println("File size: " + file.getSize());
-
-            Path uploadPath = Paths.get(System.getProperty("user.home"), "uploads");
-            Files.createDirectories(uploadPath);
-
-            String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-
-            Path filepath = uploadPath.resolve(filename);
-
             byte[] fileBytes = file.getBytes();
-
-            file.transferTo(filepath.toFile());
-
             String analysis = analyzerService.analyseDocument(fileBytes);
-
-            System.out.println("Saving to: " + filepath);
-            System.out.println("Exists? " + Files.exists(uploadPath));
-            System.out.println("Writable? " + Files.isWritable(uploadPath));
             return ResponseEntity.ok(Map.of(
                 "message", "success",
+                "filename", file.getOriginalFilename(),
                 "analysis", analysis
             ));
-
         } catch (Exception e) {
-            e.printStackTrace(); // 👈 IMPORTANT
-
             return ResponseEntity.internalServerError().body(
-                    Map.of("error", e.toString()) // 👈 FORCE full error
+                    Map.of("error", e.getMessage())
             );
         }
     }

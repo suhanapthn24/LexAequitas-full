@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Scale, Mail, Lock, User, Building, Loader2, ArrowRight, ShieldCheck, RotateCcw } from "lucide-react";
+import { Scale, Mail, Lock, User, Building, Loader2, ArrowRight } from "lucide-react";
 
 const API = "https://mpj-backend-java.onrender.com/api";
 
@@ -15,13 +15,6 @@ const AuthPage = () => {
   const { login, register, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
-
-  // MFA state
-  const [mfaStep, setMfaStep] = useState(false);       // true = show OTP screen
-  const [pendingEmail, setPendingEmail] = useState(""); // email carried into OTP step
-  const [pendingPassword, setPendingPassword] = useState(""); // needed for resend
-  const [otp, setOtp] = useState("");
-
   const [loginData, setLoginData] = useState({ email: "", password: "" });
 
   const [registerData, setRegisterData] = useState({
@@ -36,7 +29,7 @@ const AuthPage = () => {
     if (user) navigate("/cases");
   }, [user, navigate]);
 
-  // ── Step 1: validate credentials, trigger OTP email ──────────────────────
+  // ── Login: validate credentials, receive JWT ─────────────────────────────
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!loginData.email || !loginData.password) {
@@ -56,10 +49,10 @@ const AuthPage = () => {
       });
 
       if (res.ok) {
-        setPendingEmail(loginData.email.trim().toLowerCase());
-        setPendingPassword(loginData.password);
-        setMfaStep(true);
-        toast.success("A 6-digit code has been sent to your email");
+        const data = await res.json();
+        localStorage.setItem("token", data.token);
+        toast.success("Welcome back!");
+        window.location.href = "/cases";
       } else {
         const msg = await res.text();
         toast.error(msg || "Invalid credentials");
@@ -71,69 +64,7 @@ const AuthPage = () => {
     }
   };
 
-  // ── Step 2: verify OTP, receive JWT via AuthContext login ─────────────────
-  const handleOtpVerify = async (e) => {
-    e.preventDefault();
-    if (!otp || otp.length !== 6) {
-      toast.error("Enter the 6-digit code");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const res = await fetch(`${API}/auth/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: pendingEmail, otp: otp.trim() }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-
-        // Store the JWT exactly as AuthContext reads it from localStorage on mount.
-        // Do NOT call AuthContext.login() — that re-hits /api/auth/login,
-        // sends a second OTP email, and redirects back to /auth.
-        localStorage.setItem("token", data.token);
-        toast.success("Welcome back!");
-        window.location.href = "/cases"; // hard navigate so AuthContext re-hydrates
-      } else {
-        const msg = await res.text();
-        toast.error(msg || "Invalid or expired code");
-      }
-    } catch {
-      toast.error("Server error. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // ── Resend OTP ────────────────────────────────────────────────────────────
-  const handleResend = async () => {
-    setIsLoading(true);
-    try {
-      await fetch(`${API}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: pendingEmail, password: pendingPassword }),
-      });
-      setOtp("");
-      toast.success("A new code has been sent");
-    } catch {
-      toast.error("Could not resend. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // ── Back to credentials ───────────────────────────────────────────────────
-  const handleBack = () => {
-    setMfaStep(false);
-    setOtp("");
-    setPendingEmail("");
-    setPendingPassword("");
-  };
-
-  // ── Register (unchanged) ──────────────────────────────────────────────────
+  // ── Register ──────────────────────────────────────────────────────────────
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!registerData.email || !registerData.password || !registerData.fullName) {
@@ -181,84 +112,7 @@ const AuthPage = () => {
 
         <Card className="bg-[#020617] border-slate-800 p-6">
 
-          {/* ── OTP Verification Screen (replaces the tab content) ── */}
-          {mfaStep ? (
-            <div className="space-y-5">
-              {/* Header */}
-              <div className="text-center pb-2">
-                <div className="w-12 h-12 mx-auto mb-3 border border-[#D4AF37]/30 flex items-center justify-center">
-                  <ShieldCheck className="w-6 h-6 text-[#D4AF37]" />
-                </div>
-                <h2 className="text-white font-semibold text-base">Two-Factor Verification</h2>
-                <p className="text-slate-400 text-sm mt-1">
-                  We sent a 6-digit code to{" "}
-                  <span className="text-[#D4AF37] font-medium">{pendingEmail}</span>
-                </p>
-              </div>
-
-              {/* Info banner */}
-              <div className="bg-[#D4AF37]/10 border border-[#D4AF37]/20 p-3 text-[#D4AF37] text-xs">
-                Code expires in <strong>5 minutes</strong>. Check your spam folder if you don't see it.
-              </div>
-
-              <form onSubmit={handleOtpVerify} className="space-y-4">
-                <div>
-                  <label className="block text-sm text-slate-400 mb-2">Verification Code</label>
-                  <Input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={6}
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                    placeholder="000000"
-                    className="bg-transparent border-slate-700 text-white placeholder:text-slate-600 focus:border-[#D4AF37] text-center text-2xl tracking-[0.5em] font-mono font-bold"
-                    autoFocus
-                    data-testid="otp-input"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isLoading || otp.length !== 6}
-                  className="w-full bg-[#D4AF37] text-[#0F172A] hover:bg-[#c9a430] rounded-none uppercase tracking-wide font-bold py-4 disabled:opacity-40 disabled:cursor-not-allowed"
-                  data-testid="otp-submit"
-                >
-                  {isLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      Verify &amp; Sign In
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </>
-                  )}
-                </Button>
-              </form>
-
-              {/* Secondary actions */}
-              <div className="flex justify-between pt-1">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="text-slate-500 hover:text-slate-300 text-sm flex items-center gap-1 transition-colors"
-                >
-                  ← Back
-                </button>
-                <button
-                  type="button"
-                  onClick={handleResend}
-                  disabled={isLoading}
-                  className="text-[#D4AF37]/70 hover:text-[#D4AF37] text-sm flex items-center gap-1 transition-colors disabled:opacity-40"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                  Resend code
-                </button>
-              </div>
-            </div>
-
-          ) : (
-
-            /* ── Normal Login / Register Tabs ── */
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2 bg-slate-900 mb-6">
                 <TabsTrigger
                   value="login"
@@ -421,7 +275,6 @@ const AuthPage = () => {
                 </form>
               </TabsContent>
             </Tabs>
-          )}
         </Card>
 
         <p className="text-center text-slate-500 text-sm mt-6">
