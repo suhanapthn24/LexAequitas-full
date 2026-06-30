@@ -196,4 +196,4 @@ The application is deployed across three services:
 
 ## Academic Context
 
-Built as a final-year (TY SEM VI) engineering project. The name *LexAequitas* is Latin for "law and equity" — reflecting the platform's goal of making legal reasoning tools more accessible through AI.
+Built as a third-year engineering project. The name *LexAequitas* is Latin for "law and equity" — reflecting the platform's goal of making legal reasoning tools more accessible through AI.
